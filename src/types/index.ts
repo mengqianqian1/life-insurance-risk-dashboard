@@ -1,0 +1,106 @@
+/**
+ * 风险等级
+ */
+export type RiskLevel = 'high' | 'medium' | 'low'
+
+/**
+ * 时间范围筛选
+ */
+export type TimeRange = 'today' | 'week' | 'month' | 'quarter'
+
+/**
+ * 项目基础信息
+ */
+export interface InsuranceProject {
+  projectId: string
+  projectName: string
+  riskLevel: RiskLevel
+  /** 完成进度 0-100 */
+  progress: number
+  /** 出错率 0-100 */
+  errorRate: number
+  /** 项目负责人 */
+  owner: string
+}
+
+/**
+ * 风险告警
+ */
+export interface RiskAlert {
+  alertId: string
+  projectName: string
+  alertLevel: RiskLevel
+  description: string
+  /** ISO 时间字符串 */
+  alertTime: string
+}
+
+/**
+ * 顶部统计指标卡片聚合数据
+ */
+export interface StatSummary {
+  totalProjects: number
+  highRiskCount: number
+  /** 平均完成进度 0-100 */
+  avgProgress: number
+  /** 平均出错率 0-100 */
+  avgErrorRate: number
+}
+
+/**
+ * 风险等级占比统计
+ */
+export interface RiskLevelStat {
+  level: RiskLevel
+  count: number
+  percent: number
+}
+
+/**
+ * 出错率趋势点
+ */
+export interface TrendPoint {
+  /** 时间标签，如 08:00 */
+  time: string
+  /** 出错率 0-100 */
+  errorRate: number
+}
+
+/**
+ * 大屏整体聚合数据（一次筛选返回）
+ */
+export interface DashboardData {
+  stat: StatSummary
+  projects: InsuranceProject[]
+  riskLevelStats: RiskLevelStat[]
+  trend: TrendPoint[]
+  alerts: RiskAlert[]
+}
+
+/**
+ * 风险等级中文映射
+ */
+export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
+  high: '高风险',
+  medium: '中风险',
+  low: '低风险'
+}
+
+/**
+ * 风险等级颜色映射（hex）
+ */
+export const RISK_LEVEL_COLOR: Record<RiskLevel, string> = {
+  high: '#ff4d5e',
+  medium: '#ffb020',
+  low: '#2ecf7a'
+}
+
+/**
+ * 时间范围中文映射
+ */
+export const TIME_RANGE_LABEL: Record<TimeRange, string> = {
+  today: '今日',
+  week: '本周',
+  month: '本月',
+  quarter: '本季'
+}
