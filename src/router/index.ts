@@ -25,6 +25,23 @@ const routes: RouteRecordRaw[] = [
     name: 'trend',
     component: () => import('@/views/TrendView.vue'),
     meta: { title: '趋势分析' }
+  },
+  {
+    path: '/project/:projectId',
+    name: 'project-detail',
+    component: () => import('@/views/ProjectDetailView.vue'),
+    meta: { title: '项目详情' },
+    // 路由守卫：参数校验，无效 projectId 跳回总览
+    beforeEnter: (to, _from, next) => {
+      const id = to.params.projectId as string
+      // 校验 projectId 格式是否合法（以 P 开头，后跟数字）
+      const exists = id && /^P\d+$/.test(id)
+      if (!exists) {
+        next({ path: '/overview' })
+      } else {
+        next()
+      }
+    }
   }
 ]
 
@@ -34,6 +51,12 @@ const router = createRouter({
   scrollBehavior() {
     return { top: 0 }
   }
+})
+
+/** 动态标题 */
+router.afterEach((to) => {
+  const title = to.meta?.title as string | undefined
+  if (title) document.title = `寿险风控大屏 - ${title}`
 })
 
 export default router

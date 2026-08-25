@@ -6,6 +6,10 @@
   --bg-panel: rgba(16, 33, 64, 0.55);
   --bg-panel-solid: #10213f;
 
+  /* 面板组件专用变量 */
+  --panel-bg: rgba(16, 33, 64, 0.55);
+  --panel-border: rgba(64, 158, 255, 0.18);
+
   /* 边框 */
   --border-soft: rgba(64, 158, 255, 0.18);
   --border-strong: rgba(64, 158, 255, 0.45);

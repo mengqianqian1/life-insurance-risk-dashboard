@@ -17,5 +17,13 @@ export function useNow(intervalMs = 1000) {
     if (timer !== undefined) window.clearInterval(timer)
   })
 
+  // watchEffect((onCleanup) => {
+  //   const timer = setInterval(() => {
+  //     now.value = new Date()
+  //   }, intervalMs)
+  //   onCleanup(() => clearInterval(timer))   // ★ 自动清理
+  // })
+  
+
   return { now }
 }

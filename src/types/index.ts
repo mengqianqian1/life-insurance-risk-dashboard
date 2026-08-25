@@ -1,5 +1,5 @@
 /**
- * 风险等级
+ * 风险等级 type 把业务的"固定枚举值"用类型锁死  字符串字面量联合类型
  */
 export type RiskLevel = 'high' | 'medium' | 'low'
 
@@ -75,6 +75,67 @@ export interface DashboardData {
   riskLevelStats: RiskLevelStat[]
   trend: TrendPoint[]
   alerts: RiskAlert[]
+}
+
+/**
+ * 项目详情（含扩展信息）
+ */
+export interface ProjectDetail {
+  projectId: string
+  projectName: string
+  owner: string
+  riskLevel: RiskLevel
+  progress: number
+  errorRate: number
+  /** 项目启动日期 */
+  startDate: string
+  /** 预计完成日期 */
+  expectedEndDate: string
+  /** 累计保单数 */
+  totalPolicies: number
+  /** 累计保费（万元） */
+  totalPremium: number
+  /** 团队成员 */
+  teamMembers: string[]
+  /** 项目描述 */
+  description: string
+  /** 关键指标列表 */
+  keyMetrics: { label: string; value: string; unit?: string }[]
+}
+
+/**
+ * 项目对比数据（本月 vs 上月）
+ */
+export interface ProjectCompareData {
+  projectId: string
+  projectName: string
+  /** 当前月数据 */
+  currentMonth: {
+    progress: number
+    errorRate: number
+    policies: number
+    premium: number
+  }
+  /** 上月数据 */
+  previousMonth: {
+    progress: number
+    errorRate: number
+    policies: number
+    premium: number
+  }
+  /** 变化率（百分比，正数为上升，负数为下降） */
+  changes: {
+    progress: number
+    errorRate: number
+    policies: number
+    premium: number
+  }
+  /** 月度趋势（近6个月） */
+  monthlyTrend: {
+    month: string
+    progress: number
+    errorRate: number
+  }[]
 }
 
 /**

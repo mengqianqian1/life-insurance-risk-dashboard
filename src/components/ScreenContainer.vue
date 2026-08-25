@@ -12,6 +12,7 @@ import { useScreenAdapter, DESIGN_WIDTH } from '@/composables/useScreenAdapter'
 
 const { scale, stageHeight } = useScreenAdapter()
 
+
 const stageStyle = computed(() => ({
   width: DESIGN_WIDTH + 'px',
   height: stageHeight.value + 'px',

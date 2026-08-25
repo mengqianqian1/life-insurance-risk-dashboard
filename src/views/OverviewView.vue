@@ -30,7 +30,7 @@
           <span class="panel-sub">柱色按风险等级区分</span>
         </div>
         <div class="panel-body">
-          <ProgressChart :projects="projects" />
+          <ProgressChart :projects="projects" @bar-click="handleBarClick" />
         </div>
       </div>
     </section>
@@ -62,14 +62,20 @@
 </template>
 
 <script setup lang="ts">
+// 定义组件名，用于 keep-alive include 匹配
+defineOptions({ name: 'OverviewView' })
+
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import StatCard from '@/components/StatCard.vue'
 import RiskPieChart from '@/components/RiskPieChart.vue'
 import ProgressChart from '@/components/ProgressChart.vue'
 import ErrorTrendChart from '@/components/ErrorTrendChart.vue'
 import AlertList from '@/components/AlertList.vue'
 import { useDashboardStore } from '@/composables/useDashboardStore'
-import { TIME_RANGE_LABEL } from '@/types'
+import { TIME_RANGE_LABEL, type InsuranceProject } from '@/types'
+
+const router = useRouter()
 
 const { data, loading, timeRange } = useDashboardStore()
 
@@ -97,6 +103,17 @@ const trend = computed(() => data.value?.trend ?? [])
 const alerts = computed(() => data.value?.alerts ?? [])
 const alertCount = computed(() => data.value?.alerts.length ?? 0)
 const rangeLabel = computed(() => '近 ' + TIME_RANGE_LABEL[timeRange.value])
+
+/**
+ * 点击柱状图跳转项目详情页
+ */
+function handleBarClick(project: InsuranceProject) {
+  router.push({
+    name: 'project-detail',
+    params: { projectId: project.projectId },
+    query: { from: 'overview' }
+  })
+}
 </script>
 
 <style scoped>

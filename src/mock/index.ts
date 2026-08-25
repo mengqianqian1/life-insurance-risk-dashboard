@@ -1,6 +1,9 @@
+// 模拟数据
 import type {
   DashboardData,
   InsuranceProject,
+  ProjectCompareData,
+  ProjectDetail,
   RiskAlert,
   RiskLevel,
   RiskLevelStat,
@@ -18,7 +21,7 @@ interface ProjectSeed {
   owner: string
 }
 
-const PROJECT_POOL: ProjectSeed[] = [
+export const PROJECT_POOL: ProjectSeed[] = [
   { name: '智享人生终身寿险', owner: '张伟' },
   { name: '金生安康重疾险', owner: '李娜' },
   { name: '鑫如意年金保险', owner: '王强' },
@@ -105,7 +108,7 @@ function pad(n: number): string {
   return String(n).padStart(2, '0')
 }
 
-/* ============================================================
+/* ============================================================PROJECT_POOL
  * 各维度数据生成
  * ========================================================== */
 
@@ -250,5 +253,182 @@ export function fetchDashboardData(range: TimeRange): Promise<DashboardData> {
       // 模拟接口耗时 300-500ms
       300 + Math.floor(Math.random() * 200)
     )
+  })
+}
+
+/* ============================================================
+ * 项目详情 & 对比数据
+ * ========================================================== */
+
+const TEAM_POOL: string[][] = [
+  ['张伟', '李明', '王芳', '陈静'],
+  ['李娜', '刘洋', '杨帆'],
+  ['王强', '赵磊', '黄敏', '周婷', '徐涛'],
+  ['刘洋', '陈静', '马超'],
+  ['陈静', '杨帆', '赵磊', '孙莉'],
+  ['杨帆', '黄敏', '周婷'],
+  ['赵磊', '徐涛', '孙莉', '马超'],
+  ['黄敏', '周婷', '徐涛'],
+  ['周婷', '徐涛', '孙莉', '马超', '张伟'],
+  ['徐涛', '孙莉', '马超'],
+  ['孙莉', '马超', '张伟', '李明'],
+  ['马超', '张伟', '李娜', '王强']
+]
+
+const PROJECT_DESC: Record<string, string[]> = {
+  high: [
+    '该项目当前风险等级较高，主要核保规则校验失败率超过阈值，需要重点关注核保流程优化。建议加强核保系统自动化校验能力，建立实时监控预警机制。',
+    '项目理赔资金存在缺口，精算准备金计提不足。需要尽快与财务部门沟通协调，补充准备金或调整理赔策略。',
+    '反洗钱风控命中高风险名单，需要启动专项复核流程，配合监管部门完成调查工作。'
+  ],
+  medium: [
+    '项目整体运行平稳，但保单质检不合格率有所上升。建议加强质检培训，优化质检流程，提升业务人员合规意识。',
+    '客户回访失联率偏高，影响客户满意度评估。建议建立多渠道回访机制，提升客户沟通覆盖率。',
+    '渠道返佣出现异常波动，需要与渠道方进行沟通，确认返佣计算规则是否存在歧义。'
+  ],
+  low: [
+    '项目运行良好，各项指标正常。建议继续保持当前节奏，关注市场变化，适时调整产品策略。',
+    '核心系统运行稳定，响应时长在正常范围内。建议定期进行系统性能评估，确保业务高峰期稳定运行。',
+    '电子保单归档率接近目标值，建议优化归档流程，提升自动化归档比例。'
+  ]
+}
+
+/**
+ * 模拟接口：根据项目ID获取项目详情
+ */
+export function fetchProjectDetail(projectId: string): Promise<ProjectDetail | null> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const idx = PROJECT_POOL.findIndex((p) => projectId === 'P' + (PROJECT_POOL.indexOf(p) + 1) || projectId.startsWith('P'))
+      const numericId = parseInt(projectId.replace('P', ''), 10)
+      const poolIdx = !isNaN(numericId) ? numericId - 1 : idx
+      
+      if (poolIdx < 0 || poolIdx >= PROJECT_POOL.length) {
+        resolve(null)
+        return
+      }
+
+      const seed = PROJECT_POOL[poolIdx]
+      const rand = mulberry32(hashString('detail-' + projectId))
+      const riskRoll = rand()
+      let riskLevel: RiskLevel
+      if (riskRoll < 0.25) riskLevel = 'high'
+      else if (riskRoll < 0.6) riskLevel = 'medium'
+      else riskLevel = 'low'
+
+      const progress = Number((40 + rand() * 55).toFixed(1))
+      let errorRate: number
+      if (riskLevel === 'high') errorRate = Number((4 + rand() * 8).toFixed(2))
+      else if (riskLevel === 'medium') errorRate = Number((1.5 + rand() * 3).toFixed(2))
+      else errorRate = Number((0.3 + rand() * 1.5).toFixed(2))
+
+      const startDate = new Date(2025, Math.floor(rand() * 6), Math.floor(rand() * 28) + 1)
+      const expectedEnd = new Date(startDate.getTime() + (90 + rand() * 180) * 24 * 3600 * 1000)
+
+      const descArr = PROJECT_DESC[riskLevel]
+      const description = descArr[Math.floor(rand() * descArr.length)]
+
+      resolve({
+        projectId,
+        projectName: seed.name,
+        owner: seed.owner,
+        riskLevel,
+        progress,
+        errorRate,
+        startDate: startDate.toISOString().slice(0, 10),
+        expectedEndDate: expectedEnd.toISOString().slice(0, 10),
+        totalPolicies: Math.floor(1000 + rand() * 5000),
+        totalPremium: Number((500 + rand() * 3000).toFixed(1)),
+        teamMembers: TEAM_POOL[poolIdx % TEAM_POOL.length],
+        description,
+        keyMetrics: [
+          { label: '核保通过率', value: String(Number((70 + rand() * 25).toFixed(1))), unit: '%' },
+          { label: '理赔时效', value: String(Number((2 + rand() * 5).toFixed(1))), unit: '天' },
+          { label: '客户满意度', value: String(Number((80 + rand() * 18).toFixed(1))), unit: '%' },
+          { label: '续期率', value: String(Number((85 + rand() * 12).toFixed(1))), unit: '%' }
+        ]
+      })
+    }, 200 + Math.random() * 200)
+  })
+}
+
+/**
+ * 模拟接口：根据项目ID获取对比数据（本月 vs 上月）
+ */
+export function fetchProjectCompare(projectId: string): Promise<ProjectCompareData | null> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const numericId = parseInt(projectId.replace('P', ''), 10)
+      const poolIdx = !isNaN(numericId) ? numericId - 1 : -1
+
+      if (poolIdx < 0 || poolIdx >= PROJECT_POOL.length) {
+        resolve(null)
+        return
+      }
+
+      const seed = PROJECT_POOL[poolIdx]
+      const rand = mulberry32(hashString('compare-' + projectId))
+
+      // 上月基准数据
+      const prevProgress = Number((35 + rand() * 50).toFixed(1))
+      const prevErrorRate = Number((1 + rand() * 5).toFixed(2))
+      const prevPolicies = Math.floor(800 + rand() * 4000)
+      const prevPremium = Number((400 + rand() * 2500).toFixed(1))
+
+      // 本月数据（带波动）
+      const progressDelta = (rand() - 0.4) * 8 // -3.2 ~ 4.8
+      const errorDelta = (rand() - 0.4) * 2 // -0.8 ~ 0.4
+      const policiesDelta = Math.floor((rand() - 0.3) * 800)
+      const premiumDelta = Number(((rand() - 0.3) * 500).toFixed(1))
+
+      const currProgress = Math.min(100, Math.max(0, Number((prevProgress + progressDelta).toFixed(1))))
+      const currErrorRate = Math.max(0, Number((prevErrorRate + errorDelta).toFixed(2)))
+      const currPolicies = Math.max(0, prevPolicies + policiesDelta)
+      const currPremium = Math.max(0, Number((prevPremium + premiumDelta).toFixed(1)))
+
+      // 计算变化率
+      const calcChange = (curr: number, prev: number) => {
+        if (prev === 0) return 0
+        return Number((((curr - prev) / prev) * 100).toFixed(1))
+      }
+
+      // 月度趋势（近6个月）
+      const months: { month: string; progress: number; errorRate: number }[] = []
+      const now = new Date()
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const label = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`
+        const mRand = mulberry32(hashString(`trend-${projectId}-${i}`))
+        months.push({
+          month: label,
+          progress: Number((30 + mRand() * 60).toFixed(1)),
+          errorRate: Number((0.5 + mRand() * 6).toFixed(2))
+        })
+      }
+
+      resolve({
+        projectId,
+        projectName: seed.name,
+        currentMonth: {
+          progress: currProgress,
+          errorRate: currErrorRate,
+          policies: currPolicies,
+          premium: currPremium
+        },
+        previousMonth: {
+          progress: prevProgress,
+          errorRate: prevErrorRate,
+          policies: prevPolicies,
+          premium: prevPremium
+        },
+        changes: {
+          progress: calcChange(currProgress, prevProgress),
+          errorRate: calcChange(currErrorRate, prevErrorRate),
+          policies: calcChange(currPolicies, prevPolicies),
+          premium: calcChange(currPremium, prevPremium)
+        },
+        monthlyTrend: months
+      })
+    }, 200 + Math.random() * 200)
   })
 }

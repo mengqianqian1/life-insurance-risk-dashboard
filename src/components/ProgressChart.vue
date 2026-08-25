@@ -16,8 +16,12 @@ const props = withDefaults(
   { metric: 'progress' }
 )
 
+const emit = defineEmits<{
+  (e: 'bar-click', project: InsuranceProject): void
+}>()
+
 const chartRef = ref<HTMLElement | null>(null)
-const { setOption } = useEcharts(chartRef)
+const { setOption, chart } = useEcharts(chartRef)
 
 function valueOf(p: InsuranceProject): number {
   return props.metric === 'errorRate' ? p.errorRate : p.progress
@@ -93,7 +97,16 @@ function buildOption(): EChartsOption {
   }
 }
 
-onMounted(() => setOption(buildOption()))
+onMounted(() => {
+  setOption(buildOption())
+  // ECharts 点击事件：点击柱子跳转到项目详情
+  chart.value?.on('click', (params: any) => {
+    const idx = params.dataIndex
+    const proj = props.projects[idx]
+    if (proj) emit('bar-click', proj)
+  })
+})
+
 watch(() => [props.projects, props.metric], () => setOption(buildOption()), { deep: true })
 </script>
 

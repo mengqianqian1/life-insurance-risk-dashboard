@@ -16,7 +16,7 @@ export function useScreenAdapter() {
     const h = window.innerHeight
     // scale 与 stageHeight 用同一来源 s，确保 stageHeight * scale 精确 = 视口高度
     const s = w / DESIGN_WIDTH
-    scale.value = s
+    scale.value = s       
     stageHeight.value = s > 0 ? h / s : h
   }
 
