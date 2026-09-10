@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="0%" r="80%">
+      <stop offset="0" stop-color="#12345b"/>
+      <stop offset="0.48" stop-color="#0a1d38"/>
+      <stop offset="1" stop-color="#061226"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#2f9bff" stroke-opacity="0.035"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <ellipse cx="960" cy="-80" rx="920" ry="360" fill="#1a4a72" fill-opacity="0.14"/>
+  <path d="M0 860C420 700 720 980 1120 820S1640 650 1920 780V1080H0Z" fill="#061226" fill-opacity="0.28"/>
+</svg>

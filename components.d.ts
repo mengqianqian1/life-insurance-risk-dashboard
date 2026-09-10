@@ -7,19 +7,17 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AlertList: typeof import('./src/components/AlertList.vue')['default']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElSelect: typeof import('element-plus/es')['ElSelect']
-    ErrorTrendChart: typeof import('./src/components/ErrorTrendChart.vue')['default']
-    ProgressChart: typeof import('./src/components/ProgressChart.vue')['default']
-    RiskPieChart: typeof import('./src/components/RiskPieChart.vue')['default']
+    ErrorTrendChart: typeof import('./src/components/charts/ErrorTrendChart.vue')['default']
+    ProgressChart: typeof import('./src/components/charts/ProgressChart.vue')['default']
+    RiskPieChart: typeof import('./src/components/charts/RiskPieChart.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ScreenContainer: typeof import('./src/components/ScreenContainer.vue')['default']
-    StatCard: typeof import('./src/components/StatCard.vue')['default']
     TopBar: typeof import('./src/components/TopBar.vue')['default']
   }
 }

@@ -67,11 +67,11 @@ defineOptions({ name: 'OverviewView' })
 
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import StatCard from '@/components/StatCard.vue'
-import RiskPieChart from '@/components/RiskPieChart.vue'
-import ProgressChart from '@/components/ProgressChart.vue'
-import ErrorTrendChart from '@/components/ErrorTrendChart.vue'
-import AlertList from '@/components/AlertList.vue'
+import StatCard from './components/StatCard.vue'
+import RiskPieChart from '@/components/charts/RiskPieChart.vue'
+import ProgressChart from '@/components/charts/ProgressChart.vue'
+import ErrorTrendChart from '@/components/charts/ErrorTrendChart.vue'
+import AlertList from './components/AlertList.vue'
 import { useDashboardStore } from '@/composables/useDashboardStore'
 import { TIME_RANGE_LABEL, type InsuranceProject } from '@/types'
 

@@ -15,8 +15,7 @@
         v-for="tab in tabs"
         :key="tab.path"
         :to="tab.path"
-        class="nav-item"
-        active-class="active"
+        :class="['nav-item', { active: currentGroup === tab.group }]"
       >
         <span class="nav-dot"></span>
         {{ tab.label }}
@@ -43,16 +42,21 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useNow } from '@/composables/useNow'
 import { useDashboardStore } from '@/composables/useDashboardStore'
 import { TIME_RANGE_LABEL, type TimeRange } from '@/types'
 
+const route = useRoute()
+
 const tabs = [
-  { path: '/overview', label: '风险监控总览' },
-  { path: '/projects', label: '项目明细' },
-  { path: '/alerts', label: '告警中心' },
-  { path: '/trend', label: '趋势分析' }
+  { path: '/overview', label: '风险监控总览', group: 'overview' },
+  { path: '/projects', label: '项目明细', group: 'projects' },
+  { path: '/alerts', label: '告警中心', group: 'alerts' },
+  { path: '/trend', label: '趋势分析', group: 'trend' }
 ] as const
+
+const currentGroup = computed(() => route.meta.group as string | undefined)
 
 const { timeRange, setRange } = useDashboardStore()
 const { now } = useNow()

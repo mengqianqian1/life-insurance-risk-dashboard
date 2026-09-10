@@ -18,7 +18,11 @@ function buildOption(): EChartsOption {
   return {
     tooltip: {
       trigger: 'item',
-      formatter: '{b}: {c} 个 ({d}%)',
+      formatter: (params: any) => {
+        const color = params.color || '#18e0ff'
+        const marker = `<span style="display:inline-block;width:8px;height:8px;margin-right:7px;border-radius:50%;background:${color};box-shadow:0 0 6px ${color};"></span>`
+        return `${marker}${params.name}<br/>数量: ${params.value} 个 (${params.percent}%)`
+      },
       backgroundColor: 'rgba(10,20,40,0.92)',
       borderColor: 'rgba(64,158,255,0.4)',
       textStyle: { color: '#e6f0ff' }

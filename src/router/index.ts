@@ -5,32 +5,32 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/overview',
     name: 'overview',
-    component: () => import('@/views/OverviewView.vue'),
-    meta: { title: '风险监控总览' }
+    component: () => import('@/views/Overview/OverviewView.vue'),
+    meta: { title: '风险监控总览' , group:'overview'},
   },
   {
     path: '/projects',
     name: 'projects',
     component: () => import('@/views/ProjectsView.vue'),
-    meta: { title: '项目明细' }
+    meta: { title: '项目明细', group: 'projects' }
   },
   {
     path: '/alerts',
     name: 'alerts',
     component: () => import('@/views/AlertsView.vue'),
-    meta: { title: '告警中心' }
+    meta: { title: '告警中心', group: 'alerts' }
   },
   {
     path: '/trend',
     name: 'trend',
     component: () => import('@/views/TrendView.vue'),
-    meta: { title: '趋势分析' }
+    meta: { title: '趋势分析', group: 'trend' }
   },
   {
     path: '/project/:projectId',
     name: 'project-detail',
-    component: () => import('@/views/ProjectDetailView.vue'),
-    meta: { title: '项目详情' },
+    component: () => import('@/views/ProjectDetail/ProjectDetailView.vue'),
+    meta: { title: '项目详情',group:'overview'},
     // 路由守卫：参数校验，无效 projectId 跳回总览
     beforeEnter: (to, _from, next) => {
       const id = to.params.projectId as string

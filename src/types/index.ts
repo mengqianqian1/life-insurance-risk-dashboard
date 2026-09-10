@@ -101,6 +101,31 @@ export interface ProjectDetail {
   description: string
   /** 关键指标列表 */
   keyMetrics: { label: string; value: string; unit?: string }[]
+  /** 产品与项目定位 */
+  productInfo: {
+    category: string
+    targetCustomer: string
+    coverage: string
+    valueProposition: string
+  }
+  /** 销售经营数据 */
+  salesData: {
+    targetPremium: number
+    completionRate: number
+    monthlyPolicies: number
+    renewalRate: number
+    channelData: { name: string; value: number }[]
+  }
+  /** 项目价值贡献 */
+  valueMetrics: { label: string; value: string; unit?: string; trend: number }[]
+  /** 风险分析与处置建议 */
+  riskAnalysis: {
+    summary: string
+    factors: { label: string; level: RiskLevel; value: string }[]
+    action: string
+  }
+  /** 详情页重要告警 */
+  alerts: RiskAlert[]
 }
 
 /**

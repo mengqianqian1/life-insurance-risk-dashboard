@@ -346,7 +346,48 @@ export function fetchProjectDetail(projectId: string): Promise<ProjectDetail | n
           { label: '理赔时效', value: String(Number((2 + rand() * 5).toFixed(1))), unit: '天' },
           { label: '客户满意度', value: String(Number((80 + rand() * 18).toFixed(1))), unit: '%' },
           { label: '续期率', value: String(Number((85 + rand() * 12).toFixed(1))), unit: '%' }
-        ]
+        ],
+        productInfo: {
+          category: '长期保障型保险',
+          targetCustomer: '25-55 岁家庭及企业核心成员',
+          coverage: '身故保障、重疾保障、长期现金价值',
+          valueProposition: '以稳定保障和长期储蓄为核心，覆盖客户全生命周期风险。'
+        },
+        salesData: {
+          targetPremium: Number((2800 + rand() * 2600).toFixed(1)),
+          completionRate: Number((62 + rand() * 34).toFixed(1)),
+          monthlyPolicies: Math.floor(180 + rand() * 620),
+          renewalRate: Number((82 + rand() * 15).toFixed(1)),
+          channelData: [
+            { name: '代理人', value: Math.floor(35 + rand() * 20) },
+            { name: '银保渠道', value: Math.floor(18 + rand() * 18) },
+            { name: '线上直销', value: Math.floor(12 + rand() * 16) },
+            { name: '团险渠道', value: 100 }
+          ]
+        },
+        valueMetrics: [
+          { label: '预计年度价值', value: String(Math.floor(680 + rand() * 820)), unit: '万元', trend: Number((3 + rand() * 16).toFixed(1)) },
+          { label: '客户覆盖人数', value: String(Math.floor(4800 + rand() * 9200)), unit: '人', trend: Number((2 + rand() * 12).toFixed(1)) },
+          { label: '风险保障额度', value: String((1.2 + rand() * 2.8).toFixed(1)), unit: '亿元', trend: Number((1 + rand() * 10).toFixed(1)) },
+          { label: '预计续期贡献', value: String(Math.floor(320 + rand() * 520)), unit: '万元', trend: Number((4 + rand() * 14).toFixed(1)) }
+        ],
+        riskAnalysis: {
+          summary: description,
+          factors: [
+            { label: '核保质量', level: riskLevel, value: `${Math.max(72, 100 - errorRate * 4).toFixed(1)}%` },
+            { label: '销售合规', level: riskLevel === 'high' ? 'medium' : 'low', value: `${(91 + rand() * 7).toFixed(1)}%` },
+            { label: '续期稳定性', level: riskLevel === 'low' ? 'low' : 'medium', value: `${(82 + rand() * 15).toFixed(1)}%` }
+          ],
+          action: riskLevel === 'high' ? '建议 24 小时内完成专项复核，项目负责人跟进闭环。' : '建议按周复盘风险指标，持续跟踪异常变化。'
+        },
+        alerts: riskLevel === 'high'
+          ? [
+              { alertId: `D-${projectId}-01`, projectName: seed.name, alertLevel: 'high', description: '项目风险等级较高，请优先完成核保与准备金专项复核。', alertTime: new Date().toISOString() },
+              { alertId: `D-${projectId}-02`, projectName: seed.name, alertLevel: 'medium', description: '近期销售合规指标波动，建议核查重点渠道业务记录。', alertTime: new Date(Date.now() - 3600000).toISOString() }
+            ]
+          : riskLevel === 'medium'
+            ? [{ alertId: `D-${projectId}-01`, projectName: seed.name, alertLevel: 'medium', description: '项目存在需要关注的经营波动，请在本周内完成跟踪。', alertTime: new Date().toISOString() }]
+            : []
       })
     }, 200 + Math.random() * 200)
   })

@@ -51,7 +51,9 @@ function buildOption(): EChartsOption {
       formatter: (params: any) => {
         const p = Array.isArray(params) ? params[0] : params
         const proj = projects[p.dataIndex]
-        return `${proj.projectName}<br/>${isErr ? '出错率' : '完成进度'}: ${valueOf(proj)}%<br/>风险等级: ${RISK_LEVEL_LABEL[proj.riskLevel]}`
+        const color = colorOf(proj)
+        const marker = `<span style="display:inline-block;width:8px;height:8px;margin-right:7px;border-radius:50%;background:${color};box-shadow:0 0 6px ${color};"></span>`
+        return `${marker}${proj.projectName}<br/>${isErr ? '出错率' : '完成进度'}: ${valueOf(proj)}%<br/>风险等级: ${RISK_LEVEL_LABEL[proj.riskLevel]}`
       }
     },
     grid: { left: 8, right: 16, top: 26, bottom: 8, containLabel: true },

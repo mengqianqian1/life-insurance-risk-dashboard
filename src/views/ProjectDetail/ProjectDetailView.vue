@@ -35,100 +35,8 @@
     </div>
 
     <template v-else-if="detail">
-      <!-- 关键指标卡片 -->
-      <section class="metric-row">
-        <div class="metric-card">
-          <div class="metric-label">完成进度</div>
-          <div class="metric-value" :style="{ color: RISK_LEVEL_COLOR[detail.riskLevel] }">
-            {{ detail.progress }}%
-          </div>
-          <div class="metric-bar">
-            <div
-              class="metric-bar-fill"
-              :style="{
-                width: detail.progress + '%',
-                background: RISK_LEVEL_COLOR[detail.riskLevel]
-              }"
-            ></div>
-          </div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">出错率</div>
-          <div
-            class="metric-value"
-            :style="{ color: getErrorRateColor(detail.errorRate) }"
-          >
-            {{ detail.errorRate }}%
-          </div>
-          <div class="metric-bar">
-            <div
-              class="metric-bar-fill"
-              :style="{
-                width: Math.min(detail.errorRate * 10, 100) + '%',
-                background: getErrorRateColor(detail.errorRate)
-              }"
-            ></div>
-          </div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">累计保单</div>
-          <div class="metric-value">{{ detail.totalPolicies.toLocaleString() }}</div>
-          <div class="metric-unit">件</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">累计保费</div>
-          <div class="metric-value">{{ detail.totalPremium.toLocaleString() }}</div>
-          <div class="metric-unit">万元</div>
-        </div>
-      </section>
-
-      <!-- 项目基本信息 -->
-      <section class="info-row">
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title">项目基本信息</div>
-          </div>
-          <div class="panel-body info-grid">
-            <div class="info-item">
-              <span class="info-label">启动日期</span>
-              <span class="info-value">{{ detail.startDate }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">预计完成</span>
-              <span class="info-value">{{ detail.expectedEndDate }}</span>
-            </div>
-            <div class="info-item info-full">
-              <span class="info-label">项目描述</span>
-              <span class="info-value desc">{{ detail.description }}</span>
-            </div>
-            <div class="info-item info-full">
-              <span class="info-label">团队成员</span>
-              <div class="team-list">
-                <span
-                  v-for="member in detail.teamMembers"
-                  :key="member"
-                  class="team-tag"
-                >{{ member }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-title">关键指标</div>
-          </div>
-          <div class="panel-body key-metrics">
-            <div v-for="metric in detail.keyMetrics" :key="metric.label" class="key-metric">
-              <div class="km-label">{{ metric.label }}</div>
-              <div class="km-value">
-                {{ metric.value }}
-                <span v-if="metric.unit" class="km-unit">{{ metric.unit }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ProjectDetailSummary :detail="detail" />
+      <ProjectBusinessOverview :detail="detail" />
 
       <!-- 对比数据 -->
       <section class="compare-row">
@@ -209,13 +117,15 @@ import { computed, onBeforeUnmount, onMounted, ref, watch, shallowRef } from 'vu
 import { useRoute, useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import type { EChartsOption } from 'echarts'
-import { fetchProjectCompare, fetchProjectDetail } from '@/mock'
+import { getProjectCompare, getProjectDetail } from '@/api'
 import {
-  RISK_LEVEL_COLOR,
   RISK_LEVEL_LABEL,
   type ProjectCompareData,
   type ProjectDetail
 } from '@/types'
+import ProjectBusinessOverview from './components/ProjectBusinessOverview.vue'
+import ProjectDetailSummary from './components/ProjectDetailSummary.vue'
+import { useRiskAlert } from '@/composables/useRiskAlert'
 
 const route = useRoute()
 const router = useRouter()
@@ -224,6 +134,7 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const detail = ref<ProjectDetail | null>(null)
 const compareData = ref<ProjectCompareData | null>(null)
+const { triggerRiskAlert } = useRiskAlert()
 
 // 图表 DOM 引用
 const compareChartRef = ref<HTMLElement | null>(null)
@@ -234,15 +145,6 @@ const compareChart = shallowRef<echarts.ECharts | null>(null)
 const trendChart = shallowRef<echarts.ECharts | null>(null)
 let compareObserver: ResizeObserver | null = null
 let trendObserver: ResizeObserver | null = null
-
-/**
- * 获取错误率对应的颜色
- */
-function getErrorRateColor(rate: number): string {
-  if (rate >= 5) return '#ff4d5e'
-  if (rate >= 2) return '#ffb020'
-  return '#2ecf7a'
-}
 
 /**
  * 格式化变化率显示
@@ -278,8 +180,8 @@ async function loadData() {
 
   try {
     const [detailRes, compareRes] = await Promise.all([
-      fetchProjectDetail(projectId),
-      fetchProjectCompare(projectId)
+      getProjectDetail(projectId),
+      getProjectCompare(projectId)
     ])
 
     if (!detailRes) {
@@ -290,6 +192,9 @@ async function loadData() {
 
     detail.value = detailRes
     compareData.value = compareRes
+    if (detailRes.alerts.some((alert) => alert.alertLevel === 'high')) {
+      triggerRiskAlert()
+    }
     loading.value = false
 
     // 数据加载完成后初始化图表
@@ -540,6 +445,8 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: var(--gap);
   height: 100%;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 /* 头部 */
@@ -655,140 +562,6 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   color: #409eff;
   cursor: pointer;
-}
-
-/* 指标卡片 */
-.metric-row {
-  flex: 0 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--gap);
-}
-
-.metric-card {
-  padding: 20px;
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.metric-label {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.metric-value {
-  font-size: 32px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.metric-unit {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.metric-bar {
-  height: 4px;
-  background: rgba(64, 158, 255, 0.15);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 4px;
-}
-
-.metric-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-/* 信息行 */
-.info-row {
-  flex: 0 0 auto;
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: var(--gap);
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-.info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.info-full {
-  grid-column: 1 / -1;
-}
-
-.info-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.info-value {
-  font-size: 14px;
-  color: #e6f0ff;
-}
-
-.info-value.desc {
-  line-height: 1.6;
-  color: #c0cde8;
-}
-
-.team-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.team-tag {
-  padding: 4px 12px;
-  background: rgba(64, 158, 255, 0.15);
-  border: 1px solid rgba(64, 158, 255, 0.3);
-  border-radius: 14px;
-  font-size: 12px;
-  color: #409eff;
-}
-
-/* 关键指标 */
-.key-metrics {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.key-metric {
-  padding: 12px;
-  background: rgba(64, 158, 255, 0.08);
-  border-radius: 6px;
-  text-align: center;
-}
-
-.km-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-
-.km-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: #409eff;
-}
-
-.km-unit {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: normal;
 }
 
 /* 对比行 */

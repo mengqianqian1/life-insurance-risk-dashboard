@@ -51,9 +51,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import ErrorTrendChart from '@/components/ErrorTrendChart.vue'
-import ProgressChart from '@/components/ProgressChart.vue'
-import RiskPieChart from '@/components/RiskPieChart.vue'
+import ErrorTrendChart from '@/components/charts/ErrorTrendChart.vue'
+import ProgressChart from '@/components/charts/ProgressChart.vue'
+import RiskPieChart from '@/components/charts/RiskPieChart.vue'
 import { useDashboardStore } from '@/composables/useDashboardStore'
 import { RISK_LEVEL_LABEL, TIME_RANGE_LABEL, type RiskLevel } from '@/types'
 

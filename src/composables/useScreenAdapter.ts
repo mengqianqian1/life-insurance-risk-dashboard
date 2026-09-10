@@ -10,23 +10,33 @@ export const DESIGN_WIDTH = 1920
 export function useScreenAdapter() {
   const scale = ref(1)
   const stageHeight = ref(1080)
+  let resizeTimer: ReturnType<typeof setTimeout> | undefined
 
   function update() {
     const w = window.innerWidth
     const h = window.innerHeight
     // scale 与 stageHeight 用同一来源 s，确保 stageHeight * scale 精确 = 视口高度
     const s = w / DESIGN_WIDTH
-    scale.value = s       
+    scale.value = s
     stageHeight.value = s > 0 ? h / s : h
+  }
+
+  function handleResize() {
+    if (resizeTimer) clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(() => {
+      update()
+      resizeTimer = undefined
+    }, 120)
   }
 
   onMounted(() => {
     update()
-    window.addEventListener('resize', update)
+    window.addEventListener('resize', handleResize)
   })
 
   onBeforeUnmount(() => {
-    window.removeEventListener('resize', update)
+    window.removeEventListener('resize', handleResize)
+    if (resizeTimer) clearTimeout(resizeTimer)
   })
 
   return { scale, stageHeight }
