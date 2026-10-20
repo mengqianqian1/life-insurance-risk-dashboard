@@ -1,7 +1,6 @@
 import { readonly, ref } from 'vue'
 import { getDashboardData } from '@/api'
 import type { DashboardData, TimeRange } from '@/types'
-import { triggerRiskAlert } from '@/composables/useRiskAlert'
 
 /**
  * 全局大屏状态（模块级单例，跨组件共享）
@@ -22,9 +21,6 @@ async function load() {
   try {
     data.value = await getDashboardData(timeRange.value)
     lastUpdated.value = new Date()
-    if (data.value.alerts.some((alert) => alert.alertLevel === 'high')) {
-      triggerRiskAlert()
-    }
   } catch (err) {
     error.value = err instanceof Error ? err.message : '数据加载失败，请稍后重试'
   } finally {

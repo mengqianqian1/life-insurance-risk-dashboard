@@ -27,6 +27,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '趋势分析', group: 'trend' }
   },
   {
+    path: '/upload',
+    name: 'chunk-upload',
+    component: () => import('@/views/ChunkUploadView.vue'),
+    meta: { title: '分片上传', group: 'upload' }
+  },
+  {
     path: '/project/:projectId',
     name: 'project-detail',
     component: () => import('@/views/ProjectDetail/ProjectDetailView.vue'),

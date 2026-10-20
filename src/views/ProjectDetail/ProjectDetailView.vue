@@ -125,7 +125,6 @@ import {
 } from '@/types'
 import ProjectBusinessOverview from './components/ProjectBusinessOverview.vue'
 import ProjectDetailSummary from './components/ProjectDetailSummary.vue'
-import { useRiskAlert } from '@/composables/useRiskAlert'
 
 const route = useRoute()
 const router = useRouter()
@@ -134,7 +133,6 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const detail = ref<ProjectDetail | null>(null)
 const compareData = ref<ProjectCompareData | null>(null)
-const { triggerRiskAlert } = useRiskAlert()
 
 // 图表 DOM 引用
 const compareChartRef = ref<HTMLElement | null>(null)
@@ -192,9 +190,6 @@ async function loadData() {
 
     detail.value = detailRes
     compareData.value = compareRes
-    if (detailRes.alerts.some((alert) => alert.alertLevel === 'high')) {
-      triggerRiskAlert()
-    }
     loading.value = false
 
     // 数据加载完成后初始化图表

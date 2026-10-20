@@ -51,16 +51,16 @@ service.interceptors.request.use(
     // 从 localStorage 读取 token 并注入 Authorization
     const token = localStorage.getItem('token')
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.set('Authorization', `Bearer ${token}`)
     }
     return config
   },
-  (error) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error)
 )
 
 /* ---------------- 响应拦截器 ---------------- */
 service.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     const res = response.data as ApiResponse
     // 非标准结构（如文件流 / 第三方接口）不校验业务码
     if (res === null || typeof res !== 'object' || !('code' in res)) {
@@ -110,19 +110,19 @@ service.interceptors.response.use(
  * - 非标准结构（文件流等）→ 返回原始数据
  */
 function unwrap<T>(response: AxiosResponse): T {
-  const res = response.data as ApiResponse
-  if (res === null || typeof res !== 'object' || !('code' in res)) {
-    return res as unknown as T
+  const res = response.data as ApiResponse // 将响应数据转换为 ApiResponse 类型
+  if (res === null || typeof res !== 'object' || !('code' in res)) { // 判断是否为标准结构
+    return res as unknown as T // 非标准结构直接返回
   }
-  console.log(res.data,'-----------------T');
-  return res.data as T
+  console.log(res.data,'-----------------T'); // 调试日志
+  return res.data as T // 标准结构返回 data 字段
 }
 
 /**
  * 核心请求方法：泛型 T 为解包后的数据类型
  */
 function request<T>(config: AxiosRequestConfig): Promise<T> {
-  return service.request(config).then((response) => unwrap<T>(response))
+  return service.request(config).then((response: AxiosResponse) => unwrap<T>(response))
 }
 
 /** 便捷方法：带 query 的 GET */

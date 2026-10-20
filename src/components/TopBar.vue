@@ -53,7 +53,8 @@ const tabs = [
   { path: '/overview', label: '风险监控总览', group: 'overview' },
   { path: '/projects', label: '项目明细', group: 'projects' },
   { path: '/alerts', label: '告警中心', group: 'alerts' },
-  { path: '/trend', label: '趋势分析', group: 'trend' }
+  { path: '/trend', label: '趋势分析', group: 'trend' },
+  { path: '/upload', label: '分片上传', group: 'upload' }
 ] as const
 
 const currentGroup = computed(() => route.meta.group as string | undefined)

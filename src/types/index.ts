@@ -190,3 +190,5 @@ export const TIME_RANGE_LABEL: Record<TimeRange, string> = {
   month: '本月',
   quarter: '本季'
 }
+
+
